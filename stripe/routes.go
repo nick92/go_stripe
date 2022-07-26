@@ -10,6 +10,7 @@ import (
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/customer"
 	"github.com/stripe/stripe-go/v72/paymentmethod"
+	"github.com/stripe/stripe-go/v72/price"
 	"github.com/stripe/stripe-go/v72/product"
 	"github.com/stripe/stripe-go/v72/sub"
 )
@@ -129,6 +130,15 @@ func getPrices(c *gin.Context) {
 	i := product.List(params)
 	for i.Next() {
 		prod := i.Product()
+
+		if prod.DefaultPrice != nil {
+			priceparams := &stripe.PriceParams{}
+			p, err := price.Get(prod.DefaultPrice.ID, priceparams)
+			if err == nil {
+				prod.DefaultPrice = p
+			}
+		}
+
 		prods = append(prods, prod)
 	}
 	c.JSON(http.StatusOK, gin.H{"prices": prods})
