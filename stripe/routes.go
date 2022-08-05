@@ -36,7 +36,8 @@ func addCustomer(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 
 	params := &stripe.CustomerParams{
-		Name: &addCustomerRequest.Name,
+		Name:  &addCustomerRequest.Name,
+		Email: &addCustomerRequest.Email,
 		// Address: &stripe.AddressParams{
 		// 	Line1:      &addCustomerRequest.AddressLine1,
 		// 	Line2:      &addCustomerRequest.AddressLine2,
