@@ -23,6 +23,7 @@ func InitCustomerRoutes(router *gin.RouterGroup) {
 
 func InitPriceRoutes(router *gin.RouterGroup) {
 	router.GET("/get", getPrices)
+	router.POST("/add", createPaymentMethod)
 }
 
 func addCustomer(c *gin.Context) {
@@ -68,8 +69,13 @@ func addCustomer(c *gin.Context) {
 		return
 	}
 
-	custparams := &stripe.CustomerParams{}
-	custparams.DefaultSource = &pm.ID
+	invoiceParams := &stripe.CustomerInvoiceSettingsParams{
+		DefaultPaymentMethod: &pm.ID,
+	}
+
+	custparams := &stripe.CustomerParams{
+		InvoiceSettings: invoiceParams,
+	}
 
 	_, err = customer.Update(
 		cust.ID,
@@ -121,6 +127,23 @@ func getCustomer(c *gin.Context) {
 
 func deleteCustomer(c *gin.Context) {
 
+}
+
+func createPaymentMethod(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
+
+	params := &stripe.PaymentMethodParams{
+		Card: &stripe.PaymentMethodCardParams{
+			Number:   stripe.String("4242424242424242"),
+			ExpMonth: stripe.String("8"),
+			ExpYear:  stripe.String("2026"),
+			CVC:      stripe.String("314"),
+		},
+		Type: stripe.String("card"),
+	}
+	pm, _ := paymentmethod.New(params)
+
+	c.JSON(http.StatusOK, gin.H{"complete": pm.ID})
 }
 
 func getPrices(c *gin.Context) {

@@ -9,7 +9,7 @@ type AddCustomerRequest struct {
 	PostCode        string `json:"postcode"`
 	Country         string `json:"country"`
 	PaymentMethodId string `json:"payment_method_id"`
-	ProdId          string `json:"prod_id"`
+	ProdId          string `json:"product_id"`
 }
 
 type AddCustomerResponse struct {
