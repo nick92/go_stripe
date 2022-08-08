@@ -14,6 +14,7 @@ type AddCustomerRequest struct {
 
 type AddCustomerResponse struct {
 	SubscriptionId string `json:"subscription_id"`
+	CustomerId     string `json:"customer_id"`
 	Complete       bool   `json:"complete"`
 	Error          string `json:"error"`
 }

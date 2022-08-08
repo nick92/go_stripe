@@ -116,6 +116,7 @@ func addCustomer(c *gin.Context) {
 		Complete:       true,
 		SubscriptionId: s.ID,
 		Error:          "",
+		CustomerId:     cust.ID,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"complete": resp})
