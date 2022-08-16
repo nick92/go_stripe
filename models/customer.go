@@ -1,5 +1,9 @@
 package models
 
+import (
+	"github.com/stripe/stripe-go/v72"
+)
+
 type AddCustomerRequest struct {
 	Name            string `json:"name"`
 	Email           string `json:"email"`
@@ -17,4 +21,18 @@ type AddCustomerResponse struct {
 	CustomerId     string `json:"customer_id"`
 	Complete       bool   `json:"complete"`
 	Error          string `json:"error"`
+}
+
+type GetCustomerRequest struct {
+	CustomerId string `json:"customer_id"`
+}
+
+type CustomerDetailsResponse struct {
+	Customer     *stripe.Customer     `json:"customer"`
+	Subscription *stripe.Subscription `json:"subscription"`
+	Complete     bool                 `json:"complete"`
+	Error        string               `json:"error"`
+}
+
+type CustomerSubscription struct {
 }
