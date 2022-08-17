@@ -127,18 +127,39 @@ func getCustomer(c *gin.Context) {
 		subs = append(subs, s)
 	}
 
-	pm, _ := paymentmethod.Get(
+	pm, err := paymentmethod.Get(
 		cust.InvoiceSettings.DefaultPaymentMethod.ID,
 		nil,
 	)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cust.InvoiceSettings.DefaultPaymentMethod = pm
+
+	prodparams := &stripe.ProductParams{}
+
+	prod, err := product.Get(
+		subs[0].Plan.Product.ID,
+		prodparams,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	cust.InvoiceSettings.DefaultPaymentMethod = pm
 
 	resp := &models.CustomerDetailsResponse{
-		Complete:     true,
-		Error:        "",
-		Customer:     cust,
-		Subscription: subs[0],
+		Complete:      true,
+		Error:         "",
+		Customer:      cust,
+		PaymentMethod: pm,
+		ActiveProduct: prod,
+		Subscription:  subs[0],
 	}
 
 	c.JSON(http.StatusOK, gin.H{"complete": resp})
