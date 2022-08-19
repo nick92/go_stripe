@@ -167,7 +167,9 @@ func getCustomer(c *gin.Context) {
 	cust.InvoiceSettings.DefaultPaymentMethod = pm
 
 	var paymentIntents []*stripe.PaymentIntent
-	piparams := &stripe.PaymentIntentListParams{}
+	piparams := &stripe.PaymentIntentListParams{
+		Customer: &cust.ID,
+	}
 	piparams.Filters.AddFilter("limit", "", "5")
 	pi := paymentintent.List(piparams)
 	for pi.Next() {
