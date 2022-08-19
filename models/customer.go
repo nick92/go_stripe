@@ -28,12 +28,13 @@ type GetCustomerRequest struct {
 }
 
 type CustomerDetailsResponse struct {
-	Customer      *stripe.Customer      `json:"customer"`
-	Subscription  *stripe.Subscription  `json:"subscription"`
-	PaymentMethod *stripe.PaymentMethod `json:"payment_method"`
-	ActiveProduct *stripe.Product       `json:"product"`
-	Complete      bool                  `json:"complete"`
-	Error         string                `json:"error"`
+	Customer      *stripe.Customer        `json:"customer"`
+	Subscription  *stripe.Subscription    `json:"subscription"`
+	PaymentMethod *stripe.PaymentMethod   `json:"payment_method"`
+	ActiveProduct *stripe.Product         `json:"product"`
+	Payments      []*stripe.PaymentIntent `json:"payments"`
+	Complete      bool                    `json:"complete"`
+	Error         string                  `json:"error"`
 }
 
 type CustomerSubscription struct {

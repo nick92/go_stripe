@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/customer"
+	"github.com/stripe/stripe-go/v72/paymentintent"
 	"github.com/stripe/stripe-go/v72/paymentmethod"
 	"github.com/stripe/stripe-go/v72/product"
 	"github.com/stripe/stripe-go/v72/sub"
@@ -112,7 +113,11 @@ func getCustomer(c *gin.Context) {
 	cust, err := customer.Get(customerId, params)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
 		return
 	}
 
@@ -133,7 +138,11 @@ func getCustomer(c *gin.Context) {
 	)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
 		return
 	}
 
@@ -147,11 +156,24 @@ func getCustomer(c *gin.Context) {
 	)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
 		return
 	}
 
 	cust.InvoiceSettings.DefaultPaymentMethod = pm
+
+	var paymentIntents []*stripe.PaymentIntent
+	piparams := &stripe.PaymentIntentListParams{}
+	piparams.Filters.AddFilter("limit", "", "5")
+	pi := paymentintent.List(piparams)
+	for pi.Next() {
+		payment := pi.PaymentIntent()
+		paymentIntents = append(paymentIntents, payment)
+	}
 
 	resp := &models.CustomerDetailsResponse{
 		Complete:      true,
@@ -159,6 +181,7 @@ func getCustomer(c *gin.Context) {
 		Customer:      cust,
 		PaymentMethod: pm,
 		ActiveProduct: prod,
+		Payments:      paymentIntents,
 		Subscription:  subs[0],
 	}
 
