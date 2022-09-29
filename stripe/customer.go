@@ -194,6 +194,25 @@ func deleteCustomer(c *gin.Context) {
 
 }
 
+func getCustomerPaymentMethods(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
+	var customerId = c.Query("customer_id")
+	var resp []*stripe.PaymentMethod
+
+	params := &stripe.PaymentMethodListParams{
+		Customer: stripe.String(customerId),
+		Type:     stripe.String("card"),
+	}
+	i := paymentmethod.List(params)
+
+	for i.Next() {
+		pm := i.PaymentMethod()
+		resp = append(resp, pm)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": resp})
+}
+
 func createPaymentMethod(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 
