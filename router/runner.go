@@ -17,5 +17,8 @@ func SetupRouter() *gin.Engine {
 	pricesapi := router.Group("/api/prices")
 	stripe.InitPriceRoutes(pricesapi)
 
+	subsapi := router.Group("/api/subscriptions")
+	stripe.InitSubscriptionRoutes(subsapi)
+
 	return router
 }

@@ -194,6 +194,27 @@ func deleteCustomer(c *gin.Context) {
 
 }
 
+func canceCustomerSubscription(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
+	var subId = c.Query("subscription_id")
+
+	_, err := sub.Cancel(
+		subId,
+		nil,
+	)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": true})
+}
+
 func getCustomerPaymentMethods(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 	var customerId = c.Query("customer_id")

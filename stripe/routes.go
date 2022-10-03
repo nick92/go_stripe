@@ -11,6 +11,10 @@ func InitCustomerRoutes(router *gin.RouterGroup) {
 	router.GET("/payment_methods", getCustomerPaymentMethods)
 }
 
+func InitSubscriptionRoutes(router *gin.RouterGroup) {
+	router.DELETE("/cancel", canceCustomerSubscription)
+}
+
 func InitPriceRoutes(router *gin.RouterGroup) {
 	router.GET("/get", getPrices)
 	router.POST("/add", createPaymentMethod)
