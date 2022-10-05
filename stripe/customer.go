@@ -220,6 +220,19 @@ func getCustomerPaymentMethods(c *gin.Context) {
 	var customerId = c.Query("customer_id")
 	var resp []*stripe.PaymentMethod
 
+	custparams := &stripe.CustomerParams{}
+
+	cust, err := customer.Get(customerId, custparams)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
 	params := &stripe.PaymentMethodListParams{
 		Customer: stripe.String(customerId),
 		Type:     stripe.String("card"),
@@ -228,6 +241,9 @@ func getCustomerPaymentMethods(c *gin.Context) {
 
 	for i.Next() {
 		pm := i.PaymentMethod()
+		if pm.ID == cust.InvoiceSettings.DefaultPaymentMethod.ID {
+			pm.Card.Description = "default"
+		}
 		resp = append(resp, pm)
 	}
 
