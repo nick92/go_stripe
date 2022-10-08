@@ -16,6 +16,10 @@ type AddCustomerRequest struct {
 	ProdId          string `json:"product_id"`
 }
 
+type AddCustomerTestResponse struct {
+	Complete AddCustomerResponse `json:"complete"`
+}
+
 type AddCustomerResponse struct {
 	SubscriptionId string `json:"subscription_id"`
 	CustomerId     string `json:"customer_id"`
@@ -38,4 +42,8 @@ type CustomerDetailsResponse struct {
 }
 
 type CustomerSubscription struct {
+}
+
+type AddPaymentMethodResponse struct {
+	Complete string `json:"complete"`
 }

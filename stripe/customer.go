@@ -191,7 +191,21 @@ func getCustomer(c *gin.Context) {
 }
 
 func deleteCustomer(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
+	var customerId = c.Query("customer_id")
 
+	_, err := customer.Del(customerId, nil)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": true})
 }
 
 func canceCustomerSubscription(c *gin.Context) {
@@ -257,7 +271,7 @@ func createPaymentMethod(c *gin.Context) {
 		Card: &stripe.PaymentMethodCardParams{
 			Number:   stripe.String("4242424242424242"),
 			ExpMonth: stripe.String("8"),
-			ExpYear:  stripe.String("2026"),
+			ExpYear:  stripe.String("2030"),
 			CVC:      stripe.String("314"),
 		},
 		Type: stripe.String("card"),
