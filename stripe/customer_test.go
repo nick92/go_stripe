@@ -36,7 +36,7 @@ func TestCustomerAdd(t *testing.T) {
 
 	json.Unmarshal(w.Body.Bytes(), &data)
 
-	if assert.NotEqual(t, http.StatusOK, w.Code) || assert.Empty(t, data.Complete) {
+	if !assert.Equal(t, http.StatusOK, w.Code) || !assert.NotEmpty(t, data.Complete) {
 		assert.Fail(t, "Create payment method failure")
 	}
 
