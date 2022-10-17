@@ -264,6 +264,49 @@ func getCustomerPaymentMethods(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"complete": resp})
 }
 
+func setCustomerDefaultPaymentMethods(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
+	var customerId = c.Query("customer_id")
+	var paymentId = c.Query("payment_id")
+
+	custparams := &stripe.CustomerParams{}
+
+	cust, err := customer.Get(customerId, custparams)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	invoiceParams := &stripe.CustomerInvoiceSettingsParams{
+		DefaultPaymentMethod: &paymentId,
+	}
+
+	ncustparams := &stripe.CustomerParams{
+		InvoiceSettings: invoiceParams,
+	}
+
+	_, err = customer.Update(
+		cust.ID,
+		ncustparams,
+	)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": true})
+}
+
 func createPaymentMethod(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 
