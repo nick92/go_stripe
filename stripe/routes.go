@@ -7,6 +7,7 @@ import (
 func InitCustomerRoutes(router *gin.RouterGroup) {
 	router.GET("/get", getCustomer)
 	router.POST("/add", addCustomer)
+	router.POST("/add_card", createNewCustomerPaymentMethod)
 	router.DELETE("/delete", deleteCustomer)
 	router.GET("/payment_methods", getCustomerPaymentMethods)
 	router.GET("/set_default", setCustomerDefaultPaymentMethods)
