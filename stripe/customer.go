@@ -338,8 +338,31 @@ func createNewCustomerPaymentMethod(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"complete": pm.ID})
 }
 
-func createPaymentMethod(c *gin.Context) {
+func removeCustomerPaymentMethod(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
+	var paymentId = c.Query("payment_id")
+
+	payparams := &stripe.PaymentMethodDetachParams{}
+
+	pm, err := paymentmethod.Detach(
+		paymentId,
+		payparams,
+	)
+
+	if err != nil {
+		resp := &models.CustomerDetailsResponse{
+			Complete: false,
+			Error:    err.Error(),
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": pm.ID})
+}
+
+func CreatePaymentMethod(key string) string {
+	stripe.Key = key
 
 	params := &stripe.PaymentMethodParams{
 		Card: &stripe.PaymentMethodCardParams{
@@ -352,5 +375,5 @@ func createPaymentMethod(c *gin.Context) {
 	}
 	pm, _ := paymentmethod.New(params)
 
-	c.JSON(http.StatusOK, gin.H{"complete": pm.ID})
+	return pm.ID
 }

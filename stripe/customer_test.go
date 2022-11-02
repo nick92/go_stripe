@@ -9,6 +9,7 @@ import (
 	"testing"
 	"trucknav/models"
 	"trucknav/router"
+	"trucknav/stripe"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -72,4 +73,30 @@ func TestCustomerAdd(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, ww.Code)
 	assert.NotEmpty(t, customerData.Complete.CustomerId)
+}
+
+func TestCustomerPaymentAttachDetach(t *testing.T) {
+	key := "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ"
+	os.Setenv("STRIPE_KEY", key)
+	router := router.SetupRouter()
+
+	card := stripe.CreatePaymentMethod(key)
+
+	body := models.AddCustomerPaymentMethodRequest{
+		PaymentMethodId: card,
+		CustomerId:      "cus_MCstCrF3NZMC81",
+	}
+
+	jsonBody, _ := json.Marshal(body)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/api/customer/add_card", bytes.NewBuffer(jsonBody))
+	router.ServeHTTP(w, req)
+
+	w2 := httptest.NewRecorder()
+	req2, _ := http.NewRequest(http.MethodDelete, "/api/customer/delete_card?payment_id="+card, bytes.NewBuffer(jsonBody))
+	router.ServeHTTP(w2, req2)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w2.Code)
 }
