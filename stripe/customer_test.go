@@ -37,41 +37,32 @@ func TestCustomerAmendDefault(t *testing.T) {
 }
 
 func TestCustomerAdd(t *testing.T) {
-	os.Setenv("STRIPE_KEY", "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ")
+	key := "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ"
+	os.Setenv("STRIPE_KEY", key)
 	router := router.SetupRouter()
 
-	w := httptest.NewRecorder()
-	pmreq, _ := http.NewRequest(http.MethodPost, "/api/prices/add", nil)
-	router.ServeHTTP(w, pmreq)
-
-	var data models.AddPaymentMethodResponse
-
-	json.Unmarshal(w.Body.Bytes(), &data)
-
-	if !assert.Equal(t, http.StatusOK, w.Code) || !assert.NotEmpty(t, data.Complete) {
-		assert.Fail(t, "Create payment method failure")
-	}
+	card := stripe.CreatePaymentMethod(key)
 
 	body := models.AddCustomerRequest{
 		Name:            "Bob Jones",
 		Email:           "bob@email.com",
 		PostCode:        "CH21DF",
 		Country:         "GB",
-		PaymentMethodId: data.Complete,
+		PaymentMethodId: card,
 		ProdId:          "prod_M6pUxYANJ3WwSH",
 	}
 
 	jsonBody, _ := json.Marshal(body)
 
-	ww := httptest.NewRecorder()
+	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/api/customer/add", bytes.NewBuffer(jsonBody))
-	router.ServeHTTP(ww, req)
+	router.ServeHTTP(w, req)
 
 	var customerData models.AddCustomerTestResponse
 
-	json.Unmarshal(ww.Body.Bytes(), &customerData)
+	json.Unmarshal(w.Body.Bytes(), &customerData)
 
-	assert.Equal(t, http.StatusOK, ww.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotEmpty(t, customerData.Complete.CustomerId)
 }
 
