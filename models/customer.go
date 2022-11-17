@@ -39,7 +39,7 @@ type GetCustomerRequest struct {
 
 type CustomerDetailsResponse struct {
 	Customer      *stripe.Customer        `json:"customer"`
-	Subscription  *stripe.Subscription    `json:"subscription"`
+	Subscription  []*stripe.Subscription  `json:"subscriptions"`
 	PaymentMethod *stripe.PaymentMethod   `json:"payment_method"`
 	ActiveProduct *stripe.Product         `json:"product"`
 	Payments      []*stripe.PaymentIntent `json:"payments"`

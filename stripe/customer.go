@@ -148,20 +148,23 @@ func getCustomer(c *gin.Context) {
 
 	cust.InvoiceSettings.DefaultPaymentMethod = pm
 
+	var prod *stripe.Product
 	prodparams := &stripe.ProductParams{}
 
-	prod, err := product.Get(
-		subs[0].Plan.Product.ID,
-		prodparams,
-	)
+	if len(subs) > 0 {
+		prod, err = product.Get(
+			subs[0].Plan.Product.ID,
+			prodparams,
+		)
 
-	if err != nil {
-		resp := &models.CustomerDetailsResponse{
-			Complete: false,
-			Error:    err.Error(),
+		if err != nil {
+			resp := &models.CustomerDetailsResponse{
+				Complete: false,
+				Error:    err.Error(),
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
-		return
 	}
 
 	cust.InvoiceSettings.DefaultPaymentMethod = pm
@@ -184,7 +187,7 @@ func getCustomer(c *gin.Context) {
 		PaymentMethod: pm,
 		ActiveProduct: prod,
 		Payments:      paymentIntents,
-		Subscription:  subs[0],
+		Subscription:  subs,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"complete": resp})
@@ -208,7 +211,7 @@ func deleteCustomer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"complete": true})
 }
 
-func canceCustomerSubscription(c *gin.Context) {
+func cancelCustomerSubscription(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 	var subId = c.Query("subscription_id")
 
