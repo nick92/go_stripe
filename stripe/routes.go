@@ -15,6 +15,7 @@ func InitCustomerRoutes(router *gin.RouterGroup) {
 }
 
 func InitSubscriptionRoutes(router *gin.RouterGroup) {
+	router.POST("/add", addCustomerSubscription)
 	router.DELETE("/cancel", cancelCustomerSubscription)
 }
 

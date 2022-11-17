@@ -22,6 +22,11 @@ type AddCustomerPaymentMethodRequest struct {
 	PaymentMethodId string `json:"payment_method_id"`
 }
 
+type AddCustomerSubscriptionRequest struct {
+	CustomerId string `json:"customer_id"`
+	ProductId  string `json:"product_id"`
+}
+
 type AddCustomerTestResponse struct {
 	Complete AddCustomerResponse `json:"complete"`
 }

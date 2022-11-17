@@ -211,6 +211,69 @@ func deleteCustomer(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"complete": true})
 }
 
+func addCustomerSubscription(c *gin.Context) {
+	var addCustomerSubRequest models.AddCustomerSubscriptionRequest
+
+	if err := c.ShouldBindJSON(&addCustomerSubRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	custParams := &stripe.CustomerParams{}
+
+	cust, err := customer.Get(addCustomerSubRequest.CustomerId, custParams)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if cust == nil {
+		resp := &models.AddCustomerResponse{
+			Complete:   false,
+			Error:      "Missing or invalid customer acount",
+			CustomerId: addCustomerSubRequest.CustomerId,
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"complete": resp})
+		return
+	}
+
+	prodparams := &stripe.ProductParams{}
+
+	price, err := product.Get(addCustomerSubRequest.ProductId, prodparams)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	subparams := &stripe.SubscriptionParams{
+		Customer: stripe.String(addCustomerSubRequest.CustomerId),
+		Items: []*stripe.SubscriptionItemsParams{
+			{
+				Price: &price.DefaultPrice.ID,
+			},
+		},
+	}
+
+	s, err := sub.New(subparams)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp := &models.AddCustomerResponse{
+		Complete:       true,
+		SubscriptionId: s.ID,
+		Error:          "",
+		CustomerId:     addCustomerSubRequest.CustomerId,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"complete": resp})
+}
+
 func cancelCustomerSubscription(c *gin.Context) {
 	stripe.Key = os.Getenv("STRIPE_KEY")
 	var subId = c.Query("subscription_id")
