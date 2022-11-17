@@ -212,6 +212,7 @@ func deleteCustomer(c *gin.Context) {
 }
 
 func addCustomerSubscription(c *gin.Context) {
+	stripe.Key = os.Getenv("STRIPE_KEY")
 	var addCustomerSubRequest models.AddCustomerSubscriptionRequest
 
 	if err := c.ShouldBindJSON(&addCustomerSubRequest); err != nil {
