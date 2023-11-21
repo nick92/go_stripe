@@ -11,7 +11,7 @@ import (
 )
 
 func TestPricesGet(t *testing.T) {
-	os.Setenv("STRIPE_KEY", "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ")
+	os.Setenv("STRIPE_KEY", "")
 	router := router.SetupRouter()
 
 	w := httptest.NewRecorder()
