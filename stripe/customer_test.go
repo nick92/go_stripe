@@ -15,7 +15,7 @@ import (
 )
 
 func TestCustomerGet(t *testing.T) {
-	os.Setenv("STRIPE_KEY", "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ")
+	os.Setenv("STRIPE_KEY", "")
 	router := router.SetupRouter()
 
 	w := httptest.NewRecorder()
@@ -26,7 +26,7 @@ func TestCustomerGet(t *testing.T) {
 }
 
 func TestCustomerAmendDefault(t *testing.T) {
-	os.Setenv("STRIPE_KEY", "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ")
+	os.Setenv("STRIPE_KEY", "")
 	router := router.SetupRouter()
 
 	w := httptest.NewRecorder()
@@ -37,7 +37,7 @@ func TestCustomerAmendDefault(t *testing.T) {
 }
 
 func TestCustomerAdd(t *testing.T) {
-	key := "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ"
+	key := ""
 	os.Setenv("STRIPE_KEY", key)
 	router := router.SetupRouter()
 
@@ -67,7 +67,7 @@ func TestCustomerAdd(t *testing.T) {
 }
 
 func TestCustomerPaymentAttachDetach(t *testing.T) {
-	key := "sk_test_51LOSjkDssEaLCZedvZ8TylNw4aLmu7JWOp4PiLH9usx0fdNBisLQmk4ZmYuPxB4vkUiylbQ0Dgj1u16mdWII4p3b00EvxSRjgQ"
+	key := ""
 	os.Setenv("STRIPE_KEY", key)
 	router := router.SetupRouter()
 
